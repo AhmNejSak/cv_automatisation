@@ -6,3 +6,4 @@ data/
 *.pdf
 envVirtuel/
 credentials_oauth.json
+token.pickle
