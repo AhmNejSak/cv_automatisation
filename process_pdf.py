@@ -174,6 +174,5 @@ def process_pdf_files():
     print(f"🎉 Fichier Excel mis à jour : {excel_path}")
 
 
-# Fonction principale appelée dans le cadre d'une exécution de script
 if __name__ == "__main__":
     process_pdf_files()
