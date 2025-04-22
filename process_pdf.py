@@ -5,7 +5,6 @@ import time
 from langchain_mistralai import ChatMistralAI
 import pandas as pd
 
-# chagement des varaibles d'environnement
 load_dotenv()
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 project_path = os.getenv('PROJECT_PATH')
