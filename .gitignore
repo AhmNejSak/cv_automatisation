@@ -1,0 +1,8 @@
+.env
+output/
+data_processed/
+data avant ingestion/
+data/
+*.pdf
+envVirtuel/
+# wrapper_script.sh
