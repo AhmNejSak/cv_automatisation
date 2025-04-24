@@ -52,37 +52,94 @@
 ########
 
 
+# import os
+# import pickle
+# from googleapiclient.discovery import build
+# from google.auth.transport.requests import Request
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+# input_folder_id = os.getenv('INPUT_FOLDER_ID')
+# archive_folder_id = os.getenv('ARCHIVE_FOLDER_ID')
+# SCOPES = ['https://www.googleapis.com/auth/drive']
+
+# def authenticate_drive():
+#     creds = None
+#     if os.path.exists('token.pickle'):
+#         with open('token.pickle', 'rb') as token:
+#             creds = pickle.load(token)
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file(google_credentials_path, SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         with open('token.pickle', 'wb') as token:
+#             pickle.dump(creds, token)
+#     return build('drive', 'v3', credentials=creds)
+
+# def move_files_to_archive():
+#     drive_service = authenticate_drive()
+
+#     query = f"'{input_folder_id}' in parents and mimeType='application/pdf' and trashed=false"
+#     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+#     files = results.get('files', [])
+
+#     if not files:
+#         print("📂 Aucun fichier à déplacer.")
+#         return
+
+#     for file in files:
+#         try:
+#             drive_service.files().update(
+#                 fileId=file['id'],
+#                 addParents=archive_folder_id,
+#                 removeParents=input_folder_id
+#             ).execute()
+#             print(f"✅ {file['name']} déplacé dans l'archive.")
+#         except Exception as e:
+#             print(f"❌ Erreur avec {file['name']} : {e}")
+
+# if __name__ == "__main__":
+#     move_files_to_archive()
+
+
+########## SOLUTION QWEN AI ############
+
 import os
 import pickle
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
-google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-input_folder_id = os.getenv('INPUT_FOLDER_ID')
-archive_folder_id = os.getenv('ARCHIVE_FOLDER_ID')
-SCOPES = ['https://www.googleapis.com/auth/drive']
+# google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+# input_folder_id = os.getenv('INPUT_FOLDER_ID')
+# archive_folder_id = os.getenv('ARCHIVE_FOLDER_ID')
+# SCOPES = ['https://www.googleapis.com/auth/drive']
 
-def authenticate_drive():
+def authenticate_google_drive(token_path):
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists(token_path):
+        with open(token_path, 'rb') as token:
             creds = pickle.load(token)
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(google_credentials_path, SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+            raise Exception("Les credentials ne sont pas valides et ne peuvent pas être rafraîchis.")
+
     return build('drive', 'v3', credentials=creds)
 
-def move_files_to_archive():
-    drive_service = authenticate_drive()
+def move_files_to_archive(token_path, input_folder_id, archive_folder_id):
+    drive_service = authenticate_google_drive(token_path)
 
     query = f"'{input_folder_id}' in parents and mimeType='application/pdf' and trashed=false"
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
@@ -104,4 +161,8 @@ def move_files_to_archive():
             print(f"❌ Erreur avec {file['name']} : {e}")
 
 if __name__ == "__main__":
-    move_files_to_archive()
+    token_path = os.getenv('TOKEN_PATH')
+    input_folder_id = os.getenv('INPUT_FOLDER_ID')
+    archive_folder_id = os.getenv('ARCHIVE_FOLDER_ID')
+
+    move_files_to_archive(token_path, input_folder_id, archive_folder_id)

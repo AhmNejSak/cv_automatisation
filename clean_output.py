@@ -29,41 +29,113 @@
 
 
 #######
-import os
+# import os
+# import io
+# import pickle
+# import pandas as pd
+# from googleapiclient.discovery import build
+# from googleapiclient.http import MediaIoBaseDownload, MediaIoBaseUpload
+# from google.auth.transport.requests import Request
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+# output_folder_id = os.getenv('OUTPUT_FOLDER_ID')
+# SCOPES = ['https://www.googleapis.com/auth/drive']
+
+# def authenticate_drive():
+#     creds = None
+#     if os.path.exists('token.pickle'):
+#         with open('token.pickle', 'rb') as token:
+#             creds = pickle.load(token)
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file(google_credentials_path, SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         with open('token.pickle', 'wb') as token:
+#             pickle.dump(creds, token)
+#     return build('drive', 'v3', credentials=creds)
+
+# def clean_excel_on_drive():
+#     drive_service = authenticate_drive()
+
+#     # Trouver le fichier Excel sur le Drive
+#     results = drive_service.files().list(
+#         q=f"'{output_folder_id}' in parents and name='resultats.xlsx' and trashed=false",
+#         fields="files(id, name)").execute()
+#     files = results.get('files', [])
+#     if not files:
+#         print("❌ Aucun fichier resultats.xlsx trouvé.")
+#         return
+
+#     file_id = files[0]['id']
+
+#     # Télécharger
+#     request = drive_service.files().get_media(fileId=file_id)
+#     fh = io.BytesIO()
+#     downloader = MediaIoBaseDownload(fh, request)
+#     done = False
+#     while not done:
+#         _, done = downloader.next_chunk()
+#     fh.seek(0)
+
+#     df = pd.read_excel(fh)
+#     df = df.sort_values(by=['Nom'])
+#     df_cleaned = df.drop_duplicates()
+
+#     # Réécriture locale temporaire
+#     cleaned_path = '/tmp/resultats_cleaned.xlsx'
+#     df_cleaned.to_excel(cleaned_path, index=False)
+
+#     # Réécriture sur Drive (écrasement)
+#     media_body = MediaIoBaseUpload(io.FileIO(cleaned_path, 'rb'), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#     drive_service.files().update(fileId=file_id, media_body=media_body).execute()
+
+#     print("🧼 Fichier Excel nettoyé et mis à jour sur Drive.")
+
+# if __name__ == "__main__":
+#     clean_excel_on_drive()
+
+
+#######
+
+########### SOLUTION QWEN AI ###########
+
 import io
+import os
 import pickle
 import pandas as pd
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload, MediaIoBaseUpload
 from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
-google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-output_folder_id = os.getenv('OUTPUT_FOLDER_ID')
-SCOPES = ['https://www.googleapis.com/auth/drive']
 
-def authenticate_drive():
+def authenticate_google_drive(token_path):
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists(token_path):
+        with open(token_path, 'rb') as token:
             creds = pickle.load(token)
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(google_credentials_path, SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+            raise Exception("Les credentials ne sont pas valides et ne peuvent pas être rafraîchis.")
+
     return build('drive', 'v3', credentials=creds)
 
-def clean_excel_on_drive():
-    drive_service = authenticate_drive()
+def clean_excel_on_drive(token_path, output_folder_id):
+    drive_service = authenticate_google_drive(token_path)
 
-    # Trouver le fichier Excel sur le Drive
     results = drive_service.files().list(
         q=f"'{output_folder_id}' in parents and name='resultats.xlsx' and trashed=false",
         fields="files(id, name)").execute()
@@ -74,7 +146,6 @@ def clean_excel_on_drive():
 
     file_id = files[0]['id']
 
-    # Télécharger
     request = drive_service.files().get_media(fileId=file_id)
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fh, request)
@@ -87,18 +158,16 @@ def clean_excel_on_drive():
     df = df.sort_values(by=['Nom'])
     df_cleaned = df.drop_duplicates()
 
-    # Réécriture locale temporaire
     cleaned_path = '/tmp/resultats_cleaned.xlsx'
     df_cleaned.to_excel(cleaned_path, index=False)
 
-    # Réécriture sur Drive (écrasement)
     media_body = MediaIoBaseUpload(io.FileIO(cleaned_path, 'rb'), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     drive_service.files().update(fileId=file_id, media_body=media_body).execute()
 
     print("🧼 Fichier Excel nettoyé et mis à jour sur Drive.")
 
 if __name__ == "__main__":
-    clean_excel_on_drive()
+    token_path = os.getenv('TOKEN_PATH')
+    output_folder_id = os.getenv('OUTPUT_FOLDER_ID')
 
-
-#######
+    clean_excel_on_drive(token_path, output_folder_id)
