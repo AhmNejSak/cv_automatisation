@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Mon Assistant IA
+Comment=Lance l'application IA personnalisée
+Exec=/home/ahsak/Bureau/IA_projet/lancer_app.sh
+Icon=/home/ahsak/Bureau/cvApp.png
+Terminal=false
+Type=Application
+Categories=Utility;
