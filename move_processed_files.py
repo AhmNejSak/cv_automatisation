@@ -50,3 +50,5 @@ if __name__ == "__main__":
     # Déplace les fichiers traités
     moved_count = move_processed_files_to_archive(service, input_folder_id, archive_folder_id)
     print(f"✅ {moved_count} fichiers déplacés vers l'archive.")
+
+    
