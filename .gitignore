@@ -15,3 +15,5 @@ wrapper_script
 .env.lyon
 .env.lille
 .env.test
+__pycache__/
+*.__pycache__

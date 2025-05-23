@@ -1,8 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-# Choisir le fichier .env à charger
-ENV_FILE = ".env.lyon"  # ou ".env.test"
+ENV_FILE = ".env.lyon"  
 
 print(f"🔄 Chargement du fichier {ENV_FILE}")
 load_dotenv(dotenv_path=ENV_FILE)
