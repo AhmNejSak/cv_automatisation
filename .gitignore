@@ -12,3 +12,6 @@ test.py
 credentials.json
 # wrapper_script.sh pas besoins sans airflow
 wrapper_script
+.env.lyon
+.env.lille
+.env.test
