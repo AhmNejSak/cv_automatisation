@@ -4,7 +4,7 @@ import pickle
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from dotenv import load_dotenv
-load_dotenv()
+# load_dotenv()
 
 # Import des fonctions personnalisées
 from auth_utils import get_drive_service, get_file_id_by_name, get_pdf_ids_in_folder, move_files_to_archive
@@ -14,6 +14,16 @@ from move_processed_files import move_processed_files_to_archive
 
 st.set_page_config(page_title="PDF Workflow App", page_icon="📄")
 st.title("📄 Application de traitement PDF (Google Drive)")
+
+###
+st.sidebar.title("⚙️ Configuration")
+env_choice = st.sidebar.selectbox("Choisissez l'environnement :", ["lyon", "lille", "test"])
+env_file = f".env.{env_choice}"
+
+load_dotenv(dotenv_path=env_file, override=True)
+###
+
+
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 TOKEN_PATH = os.getenv("TOKEN_PATH")
