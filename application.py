@@ -18,6 +18,28 @@ st.title("📄 Application de traitement PDF (Google Drive)")
 SCOPES = ['https://www.googleapis.com/auth/drive']
 TOKEN_PATH = os.getenv("TOKEN_PATH")
 CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+
+###########
+
+
+# def variable (ville:str):
+#     load_dotenv()
+#     INPUT_FOLDER_ID = os.getenv(f"INPUT_FOLDER_ID_{ville}")
+#     OUTPUT_FOLDER_ID = os.getenv(f"OUTPUT_FOLDER_ID_{ville}")
+#     ARCHIVE_FOLDER_ID = os.getenv(f"ARCHIVE_FOLDER_ID_{ville}")
+#     return INPUT_FOLDER_ID, OUTPUT_FOLDER_ID, ARCHIVE_FOLDER_ID
+
+# ville = st.selectbox('Choississez votre ville', ["Lyon","Paris","Lille","Med"])
+
+# INPUT_FOLDER_ID, OUTPUT_FOLDER_ID, ARCHIVE_FOLDER_ID = variable(ville=ville)
+
+
+
+###########
+
+
+
 INPUT_FOLDER_ID = os.getenv("INPUT_FOLDER_ID")
 OUTPUT_FOLDER_ID = os.getenv("OUTPUT_FOLDER_ID")
 ARCHIVE_FOLDER_ID = os.getenv("ARCHIVE_FOLDER_ID")
